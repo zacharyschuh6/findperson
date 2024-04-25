@@ -85,9 +85,19 @@ class FindPersonViewController: UIViewController, ARSessionDelegate {
         let scaleX = originalImage.extent.width / maskImage.extent.width
         let scaleY = originalImage.extent.height / maskImage.extent.height
         maskImage = maskImage.transformed(by: .init(scaleX: scaleX, y: scaleY))
+        
+        let edges = maskImage.applyingFilter("CIEdges", parameters: [
+           kCIInputIntensityKey: 1.0
+        ])
+//        let borderWidth = 0.02 * min(baseImage.size.width, baseImage.size.height)
+        let borderWidth = 20
+        let wideEdges = edges.applyingFilter("CIMorphologyMaximum", parameters: [
+            kCIInputRadiusKey: borderWidth
+        ])
 
         DispatchQueue.main.async { [weak self] in
-            self?.imageView.image = UIImage(ciImage: maskImage)
+//            self?.imageView.image = UIImage(ciImage: maskImage)
+            self?.imageView.image = UIImage(ciImage: wideEdges)
         }
     }
 }
